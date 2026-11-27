@@ -101,13 +101,13 @@ This creates the Logic App with its managed identity already turned on, plus the
 
 ### Step 3. Sign in to the two connections
 
-If you used Option A:
+**If you used Option A:**
 
 1. Open the resource group and click the connection ending in `-azuremonitorlogs`.
 2. Go to General → Edit API connection, click Authorize, sign in, then click Save.
 3. Do the same for the connection ending in `-office365`. Sign in with the mailbox that should send the report.
 
-If you used Option B:
+**If you used Option B:**
 
 1. In the Logic app designer, open any action with a warning icon that uses Azure Monitor Logs. Click Change connection → Add new, sign in, and save.
 2. Do the same for an action that uses Office 365 Outlook. Sign in with the mailbox that should send the report.
