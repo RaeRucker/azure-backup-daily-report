@@ -15,6 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - run: python3 tests/check_workflow.py
+      - name: azuredeploy.json matches workflow.json
+        run: |
+          python3 tools/build_arm_template.py
+          git diff --exit-code azuredeploy.json || { echo 'Run python tools/build_arm_template.py and commit azuredeploy.json'; exit 1; }
 
   secrets:
     runs-on: ubuntu-latest

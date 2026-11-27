@@ -1,6 +1,7 @@
 """Checks logic-app/workflow.json before it's published.
 
-Fails if the file isn't valid JSON, if it has lost the expected structure, or if
+Fails if the file isn't valid JSON, if it has lost the expected structure or
+parameters, if a recipient is typed into an action instead of a parameter, or if
 a subscription ID, a non-placeholder email address or an embedded image was committed.
 Run: python tests/check_workflow.py
 """
@@ -31,6 +32,14 @@ def main() -> int:
         problems.append("missing the Recurrence trigger")
     if "If_Any_Scope_Failed" not in definition.get("actions", {}):
         problems.append("missing the If_Any_Scope_Failed condition")
+
+    for name in ("workspacesToQuery", "reportTo", "reportCc", "failureTo", "emailSubject", "teamName"):
+        if name not in definition.get("parameters", {}):
+            problems.append(f"missing the {name} parameter")
+
+    # Recipients belong in parameters, never typed into an action.
+    if EMAIL.search(json.dumps(definition.get("actions", {}))):
+        problems.append("an email address is hard-coded in an action instead of a parameter")
 
     for domain in sorted({m.group(1).lower() for m in EMAIL.finditer(text)}):
         if domain not in ALLOWED_EMAIL_DOMAINS:
