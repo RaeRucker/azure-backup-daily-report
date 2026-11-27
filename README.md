@@ -2,7 +2,7 @@
 
 A Logic App that emails an Azure Backup health report every day on a schedule you choose.
 
-Deploy it with the **Deploy to Azure** button in [Setup](#setup), or paste [`logic-app/workflow.json`](logic-app/workflow.json) into a Logic App's code view. Either way you fill in a handful of settings, sign in to two connections, and it's ready to run.
+Deploy it with the Deploy to Azure button in [Setup](#setup), or paste [`logic-app/workflow.json`](logic-app/workflow.json) into a Logic App's code view. Either way you fill in a handful of settings, sign in to two connections, and it's ready to run.
 
 ## What it does
 
@@ -46,16 +46,16 @@ These are the only things you need to fill in. Everything else works as-is.
 
 | Setting | What to put in | Where you set it |
 |---|---|---|
-| `workspaceResourceId` / `workspacesToQuery` | Resource ID of the Log Analytics workspace your vaults send logs to. Find it on the workspace under **Overview → JSON View**. It starts with `/subscriptions/` | Deploy form, or **Logic app designer → Parameters** |
-| `reportTo` | Who gets the report, as a list like `["backups@yourcompany.com", "manager@yourcompany.com"]` | Deploy form, or **Parameters** |
-| `reportCc` | Who gets copied. Use `[]` for nobody | Deploy form, or **Parameters** |
-| `failureTo` | The mailbox that gets an alert if the report fails to run | Deploy form, or **Parameters** |
-| `emailSubject` | Subject line. Default is `Daily Azure Backup Report` | Deploy form, or **Parameters** |
-| `teamName` | Your team's name, shown in the email header and footer. Default is `Azure Operations` | Deploy form, or **Parameters** |
+| `workspaceResourceId` / `workspacesToQuery` | Resource ID of the Log Analytics workspace your vaults send logs to. Find it on the workspace under Overview → JSON View. It starts with `/subscriptions/` | Deploy form, or Logic app designer → Parameters |
+| `reportTo` | Who gets the report, as a list like `["backups@yourcompany.com", "manager@yourcompany.com"]` | Deploy form, or Parameters |
+| `reportCc` | Who gets copied. Use `[]` for nobody | Deploy form, or Parameters |
+| `failureTo` | The mailbox that gets an alert if the report fails to run | Deploy form, or Parameters |
+| `emailSubject` | Subject line. Default is `Daily Azure Backup Report` | Deploy form, or Parameters |
+| `teamName` | Your team's name, shown in the email header and footer. Default is `Azure Operations` | Deploy form, or Parameters |
 | Azure Monitor Logs connection | Sign in with an account that can read the workspace | Step 3 |
 | Office 365 Outlook connection | Sign in with the mailbox the report should be sent from | Step 3 |
-| `runHour` and `timeZone` | The hour it runs each day, 0 to 23, and your time zone, like `Eastern Standard Time` or `Pacific Standard Time` | Deploy form, or **Logic app designer → Recurrence** trigger |
-| Which vaults are included | Default is every vault the workspace has logs for. To narrow it, change `vaultSubscriptionListFilter`, `vaultListFilter` or `vaultLocationListFilter` from `"*"` to names in quotes separated by commas, like `"rsv-prod-eastus2","rsv-prod-centralus"` | **Parameters** |
+| `runHour` and `timeZone` | The hour it runs each day, 0 to 23, and your time zone, like `Eastern Standard Time` or `Pacific Standard Time` | Deploy form, or Logic app designer → Recurrence trigger |
+| Which vaults are included | Default is every vault the workspace has logs for. To narrow it, change `vaultSubscriptionListFilter`, `vaultListFilter` or `vaultLocationListFilter` from `"*"` to names in quotes separated by commas, like `"rsv-prod-eastus2","rsv-prod-centralus"` | Parameters |
 
 ## Setup
 
@@ -64,12 +64,12 @@ These are the only things you need to fill in. Everything else works as-is.
 Do this for every Recovery Services vault and Backup vault you want in the report.
 
 1. In the Azure portal, open the vault.
-2. Go to **Monitoring → Diagnostic settings → Add diagnostic setting**.
+2. Go to Monitoring → Diagnostic settings → Add diagnostic setting.
 3. Name it something like `backup-to-law`.
 4. Tick every Azure Backup log category.
-5. Tick **Send to Log Analytics workspace** and pick your workspace.
-6. Set **Destination table** to **Resource specific**. The report won't work with Azure diagnostics mode.
-7. Click **Save**.
+5. Tick Send to Log Analytics workspace and pick your workspace.
+6. Set Destination table to Resource specific. The report won't work with Azure diagnostics mode.
+7. Click Save.
 
 New data can take a few hours to show up in the workspace.
 
@@ -82,53 +82,53 @@ Pick one of these. Option A is quicker.
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FRaeRucker%2Fazure-backup-daily-report%2Fmain%2Fazuredeploy.json)
 
 1. Click the button above. It opens the Azure portal with a deployment form.
-2. Pick the subscription and resource group, or click **Create new** for a new resource group.
+2. Pick the subscription and resource group, or click Create new for a new resource group.
 3. Fill in the form using the table in [What to change for your environment](#what-to-change-for-your-environment). Lists go in with square brackets and quotes, like `["backups@yourcompany.com"]`.
-4. Click **Review + create**, then **Create**.
-5. When it finishes, click **Go to resource group**. You should see the Logic App and two API connections.
+4. Click Review + create, then Create.
+5. When it finishes, click Go to resource group. You should see the Logic App and two API connections.
 
 This creates the Logic App with its managed identity already turned on, plus the two connections. The connections still need you to sign in, which is step 3.
 
 #### Option B: Paste it in yourself
 
-1. In the portal search bar, type **Logic apps** and open it.
-2. Click **Add**, then pick **Consumption**.
-3. Choose the subscription and resource group, give it a name, pick a region, and click **Review + create**, then **Create**.
-4. Open the new Logic App and go to **Settings → Identity**. On the **System assigned** tab, set **Status** to **On**, click **Save**, then **Yes**.
-5. Go to **Development Tools → Logic app code view**, select everything in the editor and delete it.
-6. Paste in the full contents of [`logic-app/workflow.json`](logic-app/workflow.json) and click **Save**. It will complain about the connections. That gets fixed in step 3.
-7. Go to **Development Tools → Logic app designer** and click **Parameters** in the top bar. Fill in each setting from the table in [What to change for your environment](#what-to-change-for-your-environment), then click **Save**.
+1. In the portal search bar, type Logic apps and open it.
+2. Click Add, then pick Consumption.
+3. Choose the subscription and resource group, give it a name, pick a region, and click Review + create, then Create.
+4. Open the new Logic App and go to Settings → Identity. On the System assigned tab, set Status to On, click Save, then Yes.
+5. Go to Development Tools → Logic app code view, select everything in the editor and delete it.
+6. Paste in the full contents of [`logic-app/workflow.json`](logic-app/workflow.json) and click Save. It will complain about the connections. That gets fixed in step 3.
+7. Go to Development Tools → Logic app designer and click Parameters in the top bar. Fill in each setting from the table in [What to change for your environment](#what-to-change-for-your-environment), then click Save.
 
 ### Step 3. Sign in to the two connections
 
-**If you used Option A:**
+If you used Option A:
 
 1. Open the resource group and click the connection ending in `-azuremonitorlogs`.
-2. Go to **General → Edit API connection**, click **Authorize**, sign in, then click **Save**.
+2. Go to General → Edit API connection, click Authorize, sign in, then click Save.
 3. Do the same for the connection ending in `-office365`. Sign in with the mailbox that should send the report.
 
-**If you used Option B:**
+If you used Option B:
 
-1. In the **Logic app designer**, open any action with a warning icon that uses **Azure Monitor Logs**. Click **Change connection → Add new**, sign in, and save.
-2. Do the same for an action that uses **Office 365 Outlook**. Sign in with the mailbox that should send the report.
-3. Every other action using the same connector picks up the new connection. Click **Save**.
+1. In the Logic app designer, open any action with a warning icon that uses Azure Monitor Logs. Click Change connection → Add new, sign in, and save.
+2. Do the same for an action that uses Office 365 Outlook. Sign in with the mailbox that should send the report.
+3. Every other action using the same connector picks up the new connection. Click Save.
 
 ### Step 4. Give the Logic App Reader
 
 The Logic App uses its own identity to read your vaults and databases. It needs Reader on every subscription you want in the report.
 
-1. In the portal search bar, type **Subscriptions** and click the one you want.
-2. Go to **Access control (IAM) → Add → Add role assignment**.
-3. Search for **Reader**, select it, and click **Next**.
-4. Under **Assign access to**, pick **Managed identity**, then click **Select members**.
-5. Under **Managed identity**, pick **Logic app**, select yours, and click **Select**.
-6. Click **Review + assign** twice.
+1. In the portal search bar, type Subscriptions and click the one you want.
+2. Go to Access control (IAM) → Add → Add role assignment.
+3. Search for Reader, select it, and click Next.
+4. Under Assign access to, pick Managed identity, then click Select members.
+5. Under Managed identity, pick Logic app, select yours, and click Select.
+6. Click Review + assign twice.
 7. Repeat for every other subscription.
 
 ### Step 5. Test it
 
-1. Open the Logic App, go to **Overview**, and click **Run trigger → Run**.
-2. Open **Runs history** and click the newest run. Every scope should show a green check.
+1. Open the Logic App, go to Overview, and click Run trigger → Run.
+2. Open Runs history and click the newest run. Every scope should show a green check.
 3. Check the inbox. The email should arrive within a few minutes.
 
 After that it runs every day at the time you set.
@@ -143,7 +143,7 @@ After that it runs every day at the time you set.
 | No email shows up but the run is green | Check the Office 365 connection and the mailbox's Sent Items. |
 | A connection shows Unauthenticated or Error | Redo step 3 for that connection. |
 | The deploy form rejects `reportTo` | It needs square brackets and quotes, like `["you@yourcompany.com"]`. |
-| You got the failure email | Open that run in **Runs history** and look for the first red action. |
+| You got the failure email | Open that run in Runs history and look for the first red action. |
 
 ## How it's built
 
