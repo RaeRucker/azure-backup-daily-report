@@ -57,6 +57,22 @@
       "metadata": {
         "description": "Team name shown in the email header and footer."
       }
+    },
+    "runHour": {
+      "type": "int",
+      "defaultValue": 6,
+      "minValue": 0,
+      "maxValue": 23,
+      "metadata": {
+        "description": "Hour of the day the report runs, 0 to 23."
+      }
+    },
+    "timeZone": {
+      "type": "string",
+      "defaultValue": "Eastern Standard Time",
+      "metadata": {
+        "description": "Windows time zone name for the schedule, like Eastern Standard Time or Pacific Standard Time."
+      }
     }
   },
   "variables": {
@@ -110,23 +126,10 @@
               "recurrence": {
                 "frequency": "Day",
                 "interval": 1,
-                "timeZone": "Eastern Standard Time",
+                "timeZone": "[parameters('timeZone')]",
                 "schedule": {
                   "hours": [
-                    6
-                  ],
-                  "minutes": [
-                    0
-                  ]
-                }
-              },
-              "evaluatedRecurrence": {
-                "frequency": "Day",
-                "interval": 1,
-                "timeZone": "Eastern Standard Time",
-                "schedule": {
-                  "hours": [
-                    6
+                    "[parameters('runHour')]"
                   ],
                   "minutes": [
                     0

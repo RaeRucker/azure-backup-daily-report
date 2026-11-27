@@ -1,12 +1,12 @@
 # Daily Azure Backup Report
 
-A Logic App that emails an Azure Backup health report every morning at 6 AM Eastern.
+A Logic App that emails an Azure Backup health report every day on a schedule you choose.
 
 Deploy it with the **Deploy to Azure** button in [Setup](#setup), or paste [`logic-app/workflow.json`](logic-app/workflow.json) into a Logic App's code view. Either way you fill in a handful of settings, sign in to two connections, and it's ready to run.
 
 ## What it does
 
-Every morning it pulls backup data from Log Analytics, Azure Resource Graph and the Azure API, then sends one email that answers four questions. Is everything protected? What failed? Is every vault set up the way it should be? Are the databases covered?
+Each run pulls backup data from Log Analytics, Azure Resource Graph and the Azure API, then sends one email that answers four questions. Is everything protected? What failed? Is every vault set up the way it should be? Are the databases covered?
 
 | # | Section | Where the data comes from |
 |---|---|---|
@@ -54,7 +54,7 @@ These are the only things you need to fill in. Everything else works as-is.
 | `teamName` | Your team's name, shown in the email header and footer. Default is `Azure Operations` | Deploy form, or **Parameters** |
 | Azure Monitor Logs connection | Sign in with an account that can read the workspace | Step 3 |
 | Office 365 Outlook connection | Sign in with the mailbox the report should be sent from | Step 3 |
-| Send time | Default is 6:00 AM Eastern every day | **Logic app designer → Recurrence** trigger |
+| `runHour` and `timeZone` | The hour it runs each day, 0 to 23, and your time zone, like `Eastern Standard Time` or `Pacific Standard Time` | Deploy form, or **Logic app designer → Recurrence** trigger |
 | Which vaults are included | Default is every vault the workspace has logs for. To narrow it, change `vaultSubscriptionListFilter`, `vaultListFilter` or `vaultLocationListFilter` from `"*"` to names in quotes separated by commas, like `"rsv-prod-eastus2","rsv-prod-centralus"` | **Parameters** |
 
 ## Setup
@@ -131,7 +131,7 @@ The Logic App uses its own identity to read your vaults and databases. It needs 
 2. Open **Runs history** and click the newest run. Every scope should show a green check.
 3. Check the inbox. The email should arrive within a few minutes.
 
-After that it runs every day at 6 AM Eastern.
+After that it runs every day at the time you set.
 
 ## If something goes wrong
 
@@ -148,7 +148,7 @@ After that it runs every day at 6 AM Eastern.
 ## How it's built
 
 ```text
-Recurrence, daily at 6:00 AM Eastern
+Recurrence, daily at the time you set
   │
   ├─ Scopes 1-3   Microsoft's Backup Reports queries against Log Analytics
   ├─ Scope 4      Resource Graph: policy assignments

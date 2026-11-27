@@ -34,6 +34,19 @@ def connection(name, api):
 def build():
     definition = json.loads(WORKFLOW.read_text(encoding="utf-8"))["definition"]
 
+    definition = escape_brackets(definition)
+
+    # The schedule comes from the deploy form instead of the copy in workflow.json.
+    # Set after escaping so these stay live template expressions.
+    trigger = definition["triggers"]["Recurrence"]
+    trigger.pop("evaluatedRecurrence", None)
+    trigger["recurrence"] = {
+        "frequency": "Day",
+        "interval": 1,
+        "timeZone": "[parameters('timeZone')]",
+        "schedule": {"hours": ["[parameters('runHour')]"], "minutes": [0]},
+    }
+
     template = {
         "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
         "contentVersion": "1.0.0.0",
@@ -47,6 +60,8 @@ def build():
             "failureTo": {"type": "string", "metadata": {"description": "Mailbox that gets the email if the report fails to run."}},
             "emailSubject": {"type": "string", "defaultValue": "Daily Azure Backup Report", "metadata": {"description": "Subject line of the report email."}},
             "teamName": {"type": "string", "defaultValue": "Azure Operations", "metadata": {"description": "Team name shown in the email header and footer."}},
+            "runHour": {"type": "int", "defaultValue": 6, "minValue": 0, "maxValue": 23, "metadata": {"description": "Hour of the day the report runs, 0 to 23."}},
+            "timeZone": {"type": "string", "defaultValue": "Eastern Standard Time", "metadata": {"description": "Windows time zone name for the schedule, like Eastern Standard Time or Pacific Standard Time."}},
         },
         "variables": {
             "logsConnectionName": "[concat(parameters('logicAppName'), '-azuremonitorlogs')]",
@@ -85,7 +100,7 @@ def build():
                 ],
                 "properties": {
                     "state": "Enabled",
-                    "definition": escape_brackets(definition),
+                    "definition": definition,
                     "parameters": {
                         "$connections": {"value": {
                             "azuremonitorlogs": connection("logsConnectionName", "azuremonitorlogs"),
