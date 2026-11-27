@@ -1,8 +1,8 @@
 # Daily Azure Backup Report
 
-A Logic App that emails a backup health report every morning at 6 AM Eastern. I built it and it runs in production.
+A Logic App that emails an Azure Backup health report every morning at 6 AM Eastern.
 
-[`logic-app/workflow.json`](logic-app/workflow.json) is the workflow exported from code view. Names, recipients, IDs and the company logo are stripped out. The logic, queries and layout are untouched.
+The whole workflow is in [`logic-app/workflow.json`](logic-app/workflow.json). Paste it into a Logic App's code view, connect it to your environment, and it's ready to run.
 
 ## What it does
 
@@ -141,7 +141,7 @@ A few choices worth explaining:
 
 ## Checks
 
-`tests/check_workflow.py` runs on every push. It fails if `workflow.json` isn't valid JSON, if the schedule or the failure branch goes missing, or if a real email address, subscription ID or embedded image ends up in the file.
+`tests/check_workflow.py` runs on every push. It fails if `workflow.json` isn't valid JSON, if the schedule or the failure branch goes missing, or if a subscription ID, an email address outside the placeholder domain, or an embedded image gets committed. That keeps environment details out of the repo.
 
 ## Known gaps
 

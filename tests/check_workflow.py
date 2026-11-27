@@ -1,7 +1,7 @@
 """Checks logic-app/workflow.json before it's published.
 
 Fails if the file isn't valid JSON, if it has lost the expected structure, or if
-an email address, subscription ID or embedded image slipped back in.
+a subscription ID, a non-placeholder email address or an embedded image was committed.
 Run: python tests/check_workflow.py
 """
 import json
@@ -38,7 +38,7 @@ def main() -> int:
 
     for sub in sorted({m.group(1) for m in SUBSCRIPTION_ID.finditer(text)}):
         if sub != ZERO_GUID:
-            problems.append(f"real-looking subscription ID {sub}")
+            problems.append(f"subscription ID {sub}")
 
     if "iVBORw0KGgo" in text:
         problems.append("embedded PNG image")
