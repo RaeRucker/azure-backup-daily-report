@@ -10,22 +10,31 @@ permissions:
 
 jobs:
   workflow:
-    name: Check workflow.json
+    name: Check the workflow and template
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - run: python3 tests/check_workflow.py
+      - name: Check workflow.json and azuredeploy.json
+        run: python3 tests/check_workflow.py
       - name: azuredeploy.json matches workflow.json
         run: |
           python3 tools/build_arm_template.py
-          git diff --exit-code azuredeploy.json || { echo 'Run python tools/build_arm_template.py and commit azuredeploy.json'; exit 1; }
+          if [ -n "$(git status --porcelain azuredeploy.json)" ]; then
+            echo 'azuredeploy.json is out of date. Run python tools/build_arm_template.py and commit it.'
+            exit 1
+          fi
 
   secrets:
+    name: Scan for secrets
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-      - run: |
-          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz | tar xz gitleaks
+      - name: Run gitleaks
+        run: |
+          curl -sSLo gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz
+          curl -sSLo checksums.txt https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_checksums.txt
+          grep ' gitleaks_8.21.2_linux_x64.tar.gz$' checksums.txt | sed 's/gitleaks_8.21.2_linux_x64.tar.gz/gitleaks.tar.gz/' | sha256sum -c -
+          tar xzf gitleaks.tar.gz gitleaks
           ./gitleaks detect --source . --redact --verbose

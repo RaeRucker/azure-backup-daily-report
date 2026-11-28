@@ -13,9 +13,9 @@ OUTPUT = ROOT / "azuredeploy.json"
 
 
 def escape_brackets(value):
-    """ARM treats any string starting with '[' as a template expression. '[[' keeps it literal."""
+    """ARM treats a string that starts with '[' and ends with ']' as an expression. '[[' keeps it literal."""
     if isinstance(value, str):
-        return "[" + value if value.startswith("[") else value
+        return "[" + value if value.startswith("[") and value.endswith("]") else value
     if isinstance(value, list):
         return [escape_brackets(v) for v in value]
     if isinstance(value, dict):
@@ -55,7 +55,7 @@ def build():
             "logicAppName": {"type": "string", "defaultValue": "la-backup-daily-report", "metadata": {"description": "Name for the Logic App."}},
             "location": {"type": "string", "defaultValue": "[resourceGroup().location]", "metadata": {"description": "Region. Defaults to the resource group's region."}},
             "workspaceResourceId": {"type": "string", "metadata": {"description": "Resource ID of the Log Analytics workspace the vaults send diagnostics to. Starts with /subscriptions/."}},
-            "reportTo": {"type": "array", "metadata": {"description": "Who gets the report, as a JSON list. Example: [\"backups@yourcompany.com\"]"}},
+            "reportTo": {"type": "array", "metadata": {"description": "Who gets the report, as a JSON list. Example: [\"backups@contoso.com\"]"}},
             "reportCc": {"type": "array", "defaultValue": [], "metadata": {"description": "Who gets copied, as a JSON list. Leave as [] for nobody."}},
             "failureTo": {"type": "string", "metadata": {"description": "Mailbox that gets the email if the report fails to run."}},
             "emailSubject": {"type": "string", "defaultValue": "Daily Azure Backup Report", "metadata": {"description": "Subject line of the report email."}},
@@ -106,7 +106,7 @@ def build():
                             "azuremonitorlogs": connection("logsConnectionName", "azuremonitorlogs"),
                             "office365": connection("outlookConnectionName", "office365"),
                         }},
-                        "workspacesToQuery": {"value": "[createArray(parameters('workspaceResourceId'))]"},
+                        "workspaceResourceId": {"value": "[parameters('workspaceResourceId')]"},
                         "reportTo": {"value": "[parameters('reportTo')]"},
                         "reportCc": {"value": "[parameters('reportCc')]"},
                         "failureTo": {"value": "[parameters('failureTo')]"},
